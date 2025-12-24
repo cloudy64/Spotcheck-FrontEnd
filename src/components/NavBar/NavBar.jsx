@@ -1,46 +1,53 @@
-// src/components/NavBar/NavBar.jsx
 
-// Import the useContext hook
 import { useContext } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
-// Import the UserContext object
+
 import { UserContext } from '../../contexts/UserContext';
 
 const NavBar = () => {
-  // Pass the UserContext object to the useContext hook to access:
-  // - The user state (which we use here).
-  // - The setUser function to update the user state (which we aren't using).
-  //
-  // Destructure the object returned by the useContext hook for easy access
-  // to the data we added to the context with familiar names.
+
   const { user, setUser } = useContext(UserContext);
 
    const handleSignOut = () => {
-    // Clear the token from localStorage
+
     localStorage.removeItem('token');
-    // Clear the user state
     setUser(null);
+  };
+
+  const handleCreateCafe = () => {
+    navigate('/');
+    setTimeout(() => {
+      window.dispatchEvent(new Event('openCafeCreator'));
+    }, 0);
   };
 
   return (
     <nav>
-      {user ? (
-        <ul>
-          <li>Welcome, {user.username}</li>
-          <li><Link to='/'>Dashboard</Link></li>
-          <li><Link to='/' onClick={handleSignOut}>Sign Out</Link></li>
-        </ul>
-      ) : (
-        <ul>
-          <li><Link to='/'>Home</Link></li>
-          <li><Link to='/sign-up'>Sign Up</Link></li>
-          <li><Link to='/sign-in'>Sign In</Link></li>
-        </ul>
-      )}
+      <ul className={`nav-list${user ? '' : ' nav-list--guest'}`}>
+        {user ? (
+          <>
+            <li>Welcome, {user.username}</li>
+            <li><Link className='nav-link' to='/'>Dashboard</Link></li>
+            {user.role === 'admin' && (
+              <li>
+                <button type='button' className='nav-action' onClick={handleCreateCafe}>
+                  Create Cafe
+                </button>
+              </li>
+            )}
+            <li><Link className='nav-link' to='/' onClick={handleSignOut}>Sign Out</Link></li>
+          </>
+        ) : (
+          <>
+            <li><Link className='nav-link' to='/'>🏠 Home</Link></li>
+            <li><Link className='nav-pill nav-pill--solid' to='/sign-up'>📝 Sign Up</Link></li>
+            <li><Link className='nav-pill nav-pill--outline' to='/sign-in'>🔐 Sign In</Link></li>
+          </>
+        )}
+      </ul>
     </nav>
   );
 };
 
 export default NavBar;
-

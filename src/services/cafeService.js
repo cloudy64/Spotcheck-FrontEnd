@@ -40,7 +40,7 @@ export const getCafeById = async (cafeId) => {
   }
 };
 
-// Filter cafes by status (Public - no auth needed)
+
 export const getCafesByStatus = async (status) => {
   try {
     const res = await fetch(`${BASE_URL}/status/${status}`, {
