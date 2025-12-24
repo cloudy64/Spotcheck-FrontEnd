@@ -2,6 +2,7 @@
 const BASE_URL = `${import.meta.env.VITE_BACK_END_SERVER_URL}/auth`;
 
 const signUp = async (formData) => {
+   console.log("✅ HIT /auth/sign-in", formData);
   try {
     const res = await fetch(`${BASE_URL}/sign-up`, {
       method: 'POST',
@@ -30,6 +31,7 @@ const signUp = async (formData) => {
 };
 
 const signIn = async (formData) => {
+   console.log("✅ HIT /auth/sign-in", formData);
   try {
     const res = await fetch(`${BASE_URL}/sign-in`, {
       method: 'POST',
@@ -38,6 +40,7 @@ const signIn = async (formData) => {
     });
 
     const data = await res.json();
+    console.log(data)
 
     if (data.err) {
       throw new Error(data.err);
@@ -50,6 +53,8 @@ const signIn = async (formData) => {
 
     throw new Error('Invalid response from server');
   } catch (err) {
+    console.log("error sign in");
+    
     console.log(err);
     throw new Error(err);
   }

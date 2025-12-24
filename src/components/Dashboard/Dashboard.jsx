@@ -1,40 +1,29 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCafes, createCafe, updateCafe, deleteCafe } from "../../services/cafeService";
+import { getCafes } from "../../services/cafeService";
 import { UserContext } from "../../contexts/UserContext";
 
-export default function AdminDashboard() {
+export default function Dashboard() {
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
   const [cafes, setCafes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [editingCafe, setEditingCafe] = useState(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    location: "",
-    description: "",
-    emoji: "☕",
-    photo: "",
-    totalSeats: 0,
-    availableSeats: 0,
-    status: "Available"
-  });
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
-    if (!user || user.role !== "admin") {
-      navigate("/cafes");
-      return;
-    }
     fetchCafes();
-  }, [user, navigate]);
+    // Load favorites from localStorage
+    const savedFavorites = JSON.parse(localStorage.getItem('favoriteCafes') || '[]');
+    setFavorites(savedFavorites);
+  }, []);
 
   const fetchCafes = async () => {
     setLoading(true);
     try {
       const data = await getCafes();
-      setCafes(data || []);
+      // Show only first 3 cafes for preview
+      setCafes((data || []).slice(0, 3));
     } catch (err) {
       console.error("Error fetching cafes:", err);
       setCafes([]);
@@ -42,76 +31,17 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === "totalSeats" || name === "availableSeats" 
-        ? parseInt(value) || 0 
-        : value
-    }));
-  };
-
-  const openCreateModal = () => {
-    setEditingCafe(null);
-    setFormData({
-      name: "",
-      location: "",
-      description: "",
-      emoji: "☕",
-      photo: "",
-      totalSeats: 0,
-      availableSeats: 0,
-      status: "Available"
-    });
-    setShowModal(true);
-  };
-
-  const openEditModal = (cafe) => {
-    setEditingCafe(cafe);
-    setFormData({
-      name: cafe.name,
-      location: cafe.location,
-      description: cafe.description || "",
-      emoji: cafe.emoji || "☕",
-      photo: cafe.photo || "",
-      totalSeats: cafe.totalSeats,
-      availableSeats: cafe.availableSeats,
-      status: cafe.status
-    });
-    setShowModal(true);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const toggleFavorite = (cafeId) => {
+    const newFavorites = favorites.includes(cafeId)
+      ? favorites.filter(id => id !== cafeId)
+      : [...favorites, cafeId];
     
-    try {
-      if (editingCafe) {
-        await updateCafe(editingCafe._id, formData);
-      } else {
-        await createCafe(formData);
-      }
-      
-      setShowModal(false);
-      fetchCafes();
-    } catch (err) {
-      console.error("Error saving cafe:", err);
-      alert("Failed to save café. Please try again.");
-    }
+    setFavorites(newFavorites);
+    localStorage.setItem('favoriteCafes', JSON.stringify(newFavorites));
   };
 
-  const handleDelete = async (cafeId, cafeName) => {
-    if (!window.confirm(`Are you sure you want to delete "${cafeName}"?`)) {
-      return;
-    }
-
-    try {
-      await deleteCafe(cafeId);
-      fetchCafes();
-    } catch (err) {
-      console.error("Error deleting cafe:", err);
-      alert("Failed to delete café. Please try again.");
-    }
+  const handleCafeClick = (cafeId) => {
+    navigate(`/cafes/${cafeId}`);
   };
 
   const getStatusEmoji = (status) => {
@@ -120,227 +50,177 @@ export default function AdminDashboard() {
     return "🔴";
   };
 
+  const getStatusClass = (status) => {
+    if (status === "Available") return "status-available";
+    if (status === "Filling") return "status-filling";
+    return "status-full";
+  };
+
+  // Calculate stats
+  const totalCafes = cafes.length;
+  const availableCafes = cafes.filter(c => c.status === "Available").length;
+  const totalSeats = cafes.reduce((sum, c) => sum + c.totalSeats, 0);
+  const availableSeats = cafes.reduce((sum, c) => sum + c.availableSeats, 0);
+
   if (loading) return <p>Loading dashboard...</p>;
 
   return (
-    <div className="admin-dashboard-container">
-      <header className="admin-header">
-        <div>
-          <h1>Admin Dashboard</h1>
-          <p>Manage campus cafés and seating availability</p>
-        </div>
-        <div className="header-actions">
-          <button onClick={openCreateModal} className="create-btn">
-            ➕ Add New Café
-          </button>
-          <button onClick={() => navigate("/cafes")} className="back-btn">
-            ← Back to Cafés
-          </button>
-        </div>
-      </header>
+    <main className="landing-spotcheck">
+      <section className="hero-section">
+        <div className="hero-content">
+          <h1 className="hero-title">
+            <span className="hero-emoji">☕</span>
+            Find a seat before you arrive.
+          </h1>
+          <p className="hero-subtitle">
+            Browse curated cafes, check real-time availability, and reserve your favorite corner.
+            {!user && " Sign up to unlock the full dashboard experience."}
+          </p>
 
-      <div className="admin-stats">
-        <div className="stat-card">
-          <h3>{cafes.length}</h3>
-          <p>Total Cafés</p>
+          {!user && (
+            <div className="hero-actions">
+              <a href="/signup" className="btn-primary">Get Started</a>
+              <a href="/signin" className="btn-secondary">Sign In</a>
+            </div>
+          )}
         </div>
-        <div className="stat-card">
-          <h3>{cafes.filter(c => c.status === "Available").length}</h3>
-          <p>Available</p>
-        </div>
-        <div className="stat-card">
-          <h3>{cafes.reduce((sum, c) => sum + c.totalSeats, 0)}</h3>
-          <p>Total Seats</p>
-        </div>
-        <div className="stat-card">
-          <h3>{cafes.reduce((sum, c) => sum + c.availableSeats, 0)}</h3>
-          <p>Available Seats</p>
-        </div>
-      </div>
 
-      <div className="admin-table-container">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Café</th>
-              <th>Location</th>
-              <th>Status</th>
-              <th>Seats</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cafes.map(cafe => (
-              <tr key={cafe._id}>
-                <td>
-                  <div className="cafe-cell">
-                    <span className="cafe-emoji">{cafe.emoji || "☕"}</span>
-                    <strong>{cafe.name}</strong>
-                  </div>
-                </td>
-                <td>{cafe.location}</td>
-                <td>
-                  <span className={`status-badge status-${cafe.status.toLowerCase()}`}>
+        {user && (
+          <div className="hero-stats">
+            <div className="stat-card">
+              <span className="stat-number">{totalCafes}</span>
+              <span className="stat-label">Total Cafés</span>
+            </div>
+            <div className="stat-card">
+              <span className="stat-number">{availableCafes}</span>
+              <span className="stat-label">Available Now</span>
+            </div>
+            <div className="stat-card">
+              <span className="stat-number">{availableSeats}</span>
+              <span className="stat-label">Open Seats</span>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section className="cafes-preview">
+        <div className="preview-header">
+          <div>
+            <h2 className="section-title">Featured Cafés</h2>
+            <p className="section-subtitle">Discover the perfect study spot on campus</p>
+          </div>
+          <a href="/cafes" className="view-all-link">View All →</a>
+        </div>
+
+        <div className="cafe-cards-grid">
+          {cafes.map((cafe) => (
+            <article
+              key={cafe._id}
+              className="cafe-preview-card"
+            >
+              <div 
+                className="cafe-image-wrapper"
+                onClick={() => handleCafeClick(cafe._id)}
+                style={{ cursor: "pointer", position: "relative" }}
+              >
+                <img
+                  src={cafe.photo || "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80"}
+                  alt={`${cafe.name} interior`}
+                  loading="lazy"
+                />
+                <span className="cafe-emoji-badge">{cafe.emoji || "☕"}</span>
+                
+                {user && (
+                  <button
+                    className="favorite-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(cafe._id);
+                    }}
+                    style={{
+                      position: "absolute",
+                      top: "0.75rem",
+                      left: "0.75rem",
+                      background: "rgba(255, 255, 255, 0.95)",
+                      border: "none",
+                      borderRadius: "50%",
+                      width: "40px",
+                      height: "40px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      fontSize: "1.5rem",
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                      transition: "transform 200ms ease"
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.1)"}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+                    aria-label={favorites.includes(cafe._id) ? "Remove from favorites" : "Add to favorites"}
+                  >
+                    {favorites.includes(cafe._id) ? "❤️" : "🤍"}
+                  </button>
+                )}
+              </div>
+
+              <div className="cafe-card-content">
+                <h3 
+                  className="cafe-card-name"
+                  onClick={() => handleCafeClick(cafe._id)}
+                  style={{ cursor: "pointer" }}
+                >
+                  {cafe.name}
+                </h3>
+                
+                <p className="cafe-card-location">📍 {cafe.location}</p>
+                <p className="cafe-card-blurb">
+                  {cafe.description || "A cozy spot perfect for studying and relaxing."}
+                </p>
+
+                <div className="cafe-card-footer">
+                  <span className={`status-badge ${getStatusClass(cafe.status)}`}>
                     {getStatusEmoji(cafe.status)} {cafe.status}
                   </span>
-                </td>
-                <td>
-                  <span className="seats-display">
-                    {cafe.availableSeats} / {cafe.totalSeats}
+                  <span className="seats-info">
+                    <strong>{cafe.availableSeats}</strong> / {cafe.totalSeats} seats
                   </span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button 
-                      onClick={() => openEditModal(cafe)}
-                      className="edit-btn"
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(cafe._id, cafe.name)}
-                      className="delete-btn"
-                    >
-                      🗑️ Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{editingCafe ? "Edit Café" : "Create New Café"}</h2>
-              <button onClick={() => setShowModal(false)} className="close-btn">
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="cafe-form">
-              <div className="form-group">
-                <label htmlFor="name">Café Name *</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="location">Location *</label>
-                <input
-                  type="text"
-                  id="location"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="e.g., Building A, 2nd Floor"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="description">Description</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows="3"
-                  placeholder="Brief description of the café..."
-                />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="emoji">Emoji</label>
-                  <input
-                    type="text"
-                    id="emoji"
-                    name="emoji"
-                    value={formData.emoji}
-                    onChange={handleInputChange}
-                    placeholder="☕"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="status">Status *</label>
-                  <select
-                    id="status"
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="Available">Available</option>
-                    <option value="Filling">Filling</option>
-                    <option value="Full">Full</option>
-                  </select>
                 </div>
               </div>
+            </article>
+          ))}
+        </div>
+      </section>
 
-              <div className="form-group">
-                <label htmlFor="photo">Photo URL</label>
-                <input
-                  type="url"
-                  id="photo"
-                  name="photo"
-                  value={formData.photo}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="totalSeats">Total Seats *</label>
-                  <input
-                    type="number"
-                    id="totalSeats"
-                    name="totalSeats"
-                    value={formData.totalSeats}
-                    onChange={handleInputChange}
-                    min="0"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="availableSeats">Available Seats *</label>
-                  <input
-                    type="number"
-                    id="availableSeats"
-                    name="availableSeats"
-                    value={formData.availableSeats}
-                    onChange={handleInputChange}
-                    min="0"
-                    max={formData.totalSeats}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-actions">
-                <button type="button" onClick={() => setShowModal(false)} className="cancel-btn">
-                  Cancel
-                </button>
-                <button type="submit" className="submit-btn">
-                  {editingCafe ? "Update Café" : "Create Café"}
-                </button>
-              </div>
-            </form>
+      <section className="features-section">
+        <h2 className="section-title">Why SpotCheck?</h2>
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-icon">⚡</div>
+            <h3>Real-Time Updates</h3>
+            <p>See live seat availability across all campus cafés instantly.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">📍</div>
+            <h3>Easy Navigation</h3>
+            <p>Get directions to your chosen café with one tap.</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">❤️</div>
+            <h3>Save Favorites</h3>
+            <p>Bookmark your go-to study spots for quick access.</p>
           </div>
         </div>
+      </section>
+
+      {!user && (
+        <section className="cta-section">
+          <div className="cta-content">
+            <h2>Ready to find your perfect study spot?</h2>
+            <p>Join SpotCheck today and never waste time looking for a seat again.</p>
+            <a href="/signup" className="btn-primary-large">Sign Up Now</a>
+          </div>
+        </section>
       )}
-    </div>
+    </main>
   );
 }

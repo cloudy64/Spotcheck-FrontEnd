@@ -10,6 +10,8 @@ export const getCafes = async () => {
     });
 
     const data = await res.json();
+    console.log(data);
+    
 
     if (!res.ok) {
       throw new Error(data.err || "Failed to fetch cafes");
@@ -40,7 +42,7 @@ export const getCafeById = async (cafeId) => {
   }
 };
 
-
+// Filter cafes by status (Public - no auth needed)
 export const getCafesByStatus = async (status) => {
   try {
     const res = await fetch(`${BASE_URL}/status/${status}`, {
@@ -145,7 +147,6 @@ export const deleteCafe = async (cafeId) => {
     });
 
     const data = await res.json();
-
     if (!res.ok) {
       throw new Error(data.err || "Failed to delete cafe");
     }
@@ -157,7 +158,7 @@ export const deleteCafe = async (cafeId) => {
   }
 };
 
-
+// Get cafe statistics (Admin only)
 export const getCafeStats = async () => {
   try {
     const res = await fetch(`${BASE_URL}/stats/overview`, {
