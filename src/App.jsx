@@ -49,6 +49,7 @@ const App = () => {
         }
         <Route path='/sign-up' element={<SignUpForm />} />
         <Route path='/sign-in' element={<SignInForm />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </>
   );

@@ -2,7 +2,7 @@
 const BASE_URL = `${import.meta.env.VITE_BACK_END_SERVER_URL}/auth`;
 
 const signUp = async (formData) => {
-   console.log("✅ HIT /auth/sign-in", formData);
+
   try {
     const res = await fetch(`${BASE_URL}/sign-up`, {
       method: 'POST',
@@ -31,7 +31,7 @@ const signUp = async (formData) => {
 };
 
 const signIn = async (formData) => {
-   console.log("✅ HIT /auth/sign-in", formData);
+
   try {
     const res = await fetch(`${BASE_URL}/sign-in`, {
       method: 'POST',

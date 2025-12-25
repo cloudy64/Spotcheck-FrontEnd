@@ -17,9 +17,21 @@ export default function AdminDashboard() {
     description: "",
     emoji: "☕",
     photo: "",
-    totalSeats: 0,
-    availableSeats: 0,
-    status: "Available"
+    totalSeats: 50,
+    availableSeats: 50,
+    status: "Available",
+    hours: {
+      weekday: { open: "07:00", close: "23:00" },
+      saturday: { open: "09:00", close: "21:00" },
+      sunday: { open: "10:00", close: "20:00" }
+    },
+    amenities: {
+      wifi: true,
+      powerOutlets: true,
+      quietZone: false,
+      foodAvailable: true
+    },
+    noiseLevel: "Moderate"
   });
 
   useEffect(() => {
@@ -52,6 +64,29 @@ export default function AdminDashboard() {
     }));
   };
 
+  const handleHoursChange = (day, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      hours: {
+        ...prev.hours,
+        [day]: {
+          ...prev.hours[day],
+          [field]: value
+        }
+      }
+    }));
+  };
+
+  const handleAmenityChange = (amenity) => {
+    setFormData(prev => ({
+      ...prev,
+      amenities: {
+        ...prev.amenities,
+        [amenity]: !prev.amenities[amenity]
+      }
+    }));
+  };
+
   const openCreateModal = () => {
     setEditingCafe(null);
     setFormData({
@@ -60,9 +95,21 @@ export default function AdminDashboard() {
       description: "",
       emoji: "☕",
       photo: "",
-      totalSeats: 0,
-      availableSeats: 0,
-      status: "Available"
+      totalSeats: 50,
+      availableSeats: 50,
+      status: "Available",
+      hours: {
+        weekday: { open: "07:00", close: "23:00" },
+        saturday: { open: "09:00", close: "21:00" },
+        sunday: { open: "10:00", close: "20:00" }
+      },
+      amenities: {
+        wifi: true,
+        powerOutlets: true,
+        quietZone: false,
+        foodAvailable: true
+      },
+      noiseLevel: "Moderate"
     });
     setShowModal(true);
   };
@@ -77,7 +124,19 @@ export default function AdminDashboard() {
       photo: cafe.photo || "",
       totalSeats: cafe.totalSeats,
       availableSeats: cafe.availableSeats,
-      status: cafe.status
+      status: cafe.status,
+      hours: cafe.hours || {
+        weekday: { open: "07:00", close: "23:00" },
+        saturday: { open: "09:00", close: "21:00" },
+        sunday: { open: "10:00", close: "20:00" }
+      },
+      amenities: cafe.amenities || {
+        wifi: true,
+        powerOutlets: true,
+        quietZone: false,
+        foodAvailable: true
+      },
+      noiseLevel: cafe.noiseLevel || "Moderate"
     });
     setShowModal(true);
   };
@@ -213,27 +272,45 @@ export default function AdminDashboard() {
 
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content enhanced-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>{editingCafe ? "Edit Café" : "Create New Café"}</h2>
+              <h2>{editingCafe ? "✏️ Edit Café" : "➕ Add New Café"}</h2>
               <button onClick={() => setShowModal(false)} className="close-btn">
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="cafe-form">
-              <div className="form-group">
-                <label htmlFor="name">Café Name *</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                />
+            <form onSubmit={handleSubmit} className="cafe-form enhanced-form">
+              {/* Row 1: Name and Emoji */}
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="name">Café Name *</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="E.g., Central Library Café"
+                    required
+                  />
+                </div>
+
+                <div className="form-group emoji-group">
+                  <label htmlFor="emoji">Café Emoji ☕</label>
+                  <input
+                    type="text"
+                    id="emoji"
+                    name="emoji"
+                    value={formData.emoji}
+                    onChange={handleInputChange}
+                    placeholder="☕"
+                    maxLength="2"
+                  />
+                </div>
               </div>
 
+              {/* Location */}
               <div className="form-group">
                 <label htmlFor="location">Location *</label>
                 <input
@@ -243,66 +320,14 @@ export default function AdminDashboard() {
                   value={formData.location}
                   onChange={handleInputChange}
                   required
-                  placeholder="e.g., Building A, 2nd Floor"
+                  placeholder="E.g., Library Building, 2nd Floor, Room 201"
                 />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="description">Description</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows="3"
-                  placeholder="Brief description of the café..."
-                />
-              </div>
-
+              {/* Row 2: Capacity and Available Seats */}
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="emoji">Emoji</label>
-                  <input
-                    type="text"
-                    id="emoji"
-                    name="emoji"
-                    value={formData.emoji}
-                    onChange={handleInputChange}
-                    placeholder="☕"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="status">Status *</label>
-                  <select
-                    id="status"
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="Available">Available</option>
-                    <option value="Filling">Filling</option>
-                    <option value="Full">Full</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="photo">Photo URL</label>
-                <input
-                  type="url"
-                  id="photo"
-                  name="photo"
-                  value={formData.photo}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="totalSeats">Total Seats *</label>
+                  <label htmlFor="totalSeats">Total Capacity *</label>
                   <input
                     type="number"
                     id="totalSeats"
@@ -315,7 +340,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="availableSeats">Available Seats *</label>
+                  <label htmlFor="availableSeats">Initial Available Seats *</label>
                   <input
                     type="number"
                     id="availableSeats"
@@ -329,12 +354,125 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
+              {/* Upload Photo */}
+              <div className="form-group">
+                <label htmlFor="photo">Upload Photo</label>
+                <div className="photo-upload-area">
+                  <div className="upload-icon">📷</div>
+                  <p>Click to upload or drag and drop</p>
+                  <p className="upload-hint">PNG, JPG up to 5MB</p>
+                  <input
+                    type="url"
+                    id="photo"
+                    name="photo"
+                    value={formData.photo}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com/image.jpg"
+                    style={{ marginTop: "0.5rem" }}
+                  />
+                </div>
+              </div>
+
+              {/* Operating Hours */}
+              <div className="form-group">
+                <label>Operating Hours *</label>
+                <div className="hours-grid">
+                  <div className="hours-row">
+                    <span className="day-label">Monday - Friday</span>
+                    <input
+                      type="time"
+                      value={formData.hours.weekday.open}
+                      onChange={(e) => handleHoursChange('weekday', 'open', e.target.value)}
+                    />
+                    <span>to</span>
+                    <input
+                      type="time"
+                      value={formData.hours.weekday.close}
+                      onChange={(e) => handleHoursChange('weekday', 'close', e.target.value)}
+                    />
+                  </div>
+
+                  <div className="hours-row">
+                    <span className="day-label">Saturday</span>
+                    <input
+                      type="time"
+                      value={formData.hours.saturday.open}
+                      onChange={(e) => handleHoursChange('saturday', 'open', e.target.value)}
+                    />
+                    <span>to</span>
+                    <input
+                      type="time"
+                      value={formData.hours.saturday.close}
+                      onChange={(e) => handleHoursChange('saturday', 'close', e.target.value)}
+                    />
+                  </div>
+
+                  <div className="hours-row">
+                    <span className="day-label">Sunday</span>
+                    <input
+                      type="time"
+                      value={formData.hours.sunday.open}
+                      onChange={(e) => handleHoursChange('sunday', 'open', e.target.value)}
+                    />
+                    <span>to</span>
+                    <input
+                      type="time"
+                      value={formData.hours.sunday.close}
+                      onChange={(e) => handleHoursChange('sunday', 'close', e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Amenities */}
+              <div className="form-group">
+                <label>Amenities</label>
+                <div className="amenities-checkboxes">
+                  <label className={formData.amenities.wifi ? "checked" : ""}>
+                    <input
+                      type="checkbox"
+                      checked={formData.amenities.wifi}
+                      onChange={() => handleAmenityChange('wifi')}
+                    />
+                    <span>📶 Fast WiFi</span>
+                  </label>
+
+                  <label className={formData.amenities.powerOutlets ? "checked" : ""}>
+                    <input
+                      type="checkbox"
+                      checked={formData.amenities.powerOutlets}
+                      onChange={() => handleAmenityChange('powerOutlets')}
+                    />
+                    <span>🔌 Power Outlets</span>
+                  </label>
+
+                  <label className={formData.amenities.quietZone ? "checked" : ""}>
+                    <input
+                      type="checkbox"
+                      checked={formData.amenities.quietZone}
+                      onChange={() => handleAmenityChange('quietZone')}
+                    />
+                    <span>🤫 Quiet Zone</span>
+                  </label>
+
+                  <label className={formData.amenities.foodAvailable ? "checked" : ""}>
+                    <input
+                      type="checkbox"
+                      checked={formData.amenities.foodAvailable}
+                      onChange={() => handleAmenityChange('foodAvailable')}
+                    />
+                    <span>🍽️ Food Available</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Form Actions */}
               <div className="form-actions">
                 <button type="button" onClick={() => setShowModal(false)} className="cancel-btn">
                   Cancel
                 </button>
                 <button type="submit" className="submit-btn">
-                  {editingCafe ? "Update Café" : "Create Café"}
+                  💾 {editingCafe ? "Update Café" : "Save Café"}
                 </button>
               </div>
             </form>

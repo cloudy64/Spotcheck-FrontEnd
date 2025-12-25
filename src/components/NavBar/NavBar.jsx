@@ -1,25 +1,18 @@
-
 import { useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
-
-
 import { UserContext } from '../../contexts/UserContext';
 
 const NavBar = () => {
-
   const { user, setUser } = useContext(UserContext);
+  const navigate = useNavigate(); 
 
-   const handleSignOut = () => {
-
+  const handleSignOut = () => {
     localStorage.removeItem('token');
     setUser(null);
   };
 
   const handleCreateCafe = () => {
-    navigate('/');
-    setTimeout(() => {
-      window.dispatchEvent(new Event('openCafeCreator'));
-    }, 0);
+    navigate('/admin'); 
   };
 
   return (
