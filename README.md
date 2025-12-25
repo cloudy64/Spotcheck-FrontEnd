@@ -1,4 +1,14 @@
+Technologies Used
+1. JavaScript
 
+2. HTML
+Provides the structure and layout of the web pages.
+
+3. CSS
+Responsible for styling the application.
+
+4. Express.js
+Framework used to build the backend server and manage routes.
 
 
 
