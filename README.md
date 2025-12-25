@@ -1,3 +1,6 @@
+<img width="1655" height="931" alt="Screenshot 2025-12-26 at 2 37 54 AM" src="https://github.com/user-attachments/assets/16050cc6-8aab-4e65-ae7b-b72d6d5089cc" />
+
+
 Technologies Used
 1. JavaScript
 
