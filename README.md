@@ -10,6 +10,11 @@ Responsible for styling the application.
 4. Express.js
 Framework used to build the backend server and manage routes.
 
+Future work:
+-create favourites section
+-the css need a better structure
+-if a cafe is cloed it will graycolor
+-most popular cafes
 
 
 Trello:
