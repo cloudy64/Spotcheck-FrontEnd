@@ -144,6 +144,7 @@ export default function AdminDashboard() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    
     try {
       if (editingCafe) {
         await updateCafe(editingCafe._id, formData);
@@ -192,11 +193,11 @@ export default function AdminDashboard() {
           <button onClick={openCreateModal} className="create-btn">
             ➕ Add New Café
           </button>
-          <button onClick={() => navigate("/cafes")} className="back-btn">
-            ← Back to Cafés
-          </button>
-        </div>
-      </header>
+            <button onClick={() => navigate("/")} className="back-btn">
+           ← Back to Dashboard
+            </button>
+         </div>
+         </header>
 
       <div className="admin-stats">
         <div className="stat-card">
@@ -468,7 +469,7 @@ export default function AdminDashboard() {
 
               {/* Form Actions */}
               <div className="form-actions">
-                <button type="button" onClick={() => setShowModal(false)} className="cancel-btn">
+                <button type="button" onClick={() => setShowModal(true)} className="cancel-btn">
                   Cancel
                 </button>
                 <button type="submit" className="submit-btn">

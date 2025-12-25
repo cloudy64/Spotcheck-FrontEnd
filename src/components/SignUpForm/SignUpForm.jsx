@@ -84,7 +84,7 @@ export default function SignUp() {
                 name="email"
                 value={email}
                 onChange={handleChange}
-                placeholder="your.email@university.edu"
+                placeholder="your.email@gmail.com"
                 required
               />
             </div>

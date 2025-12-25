@@ -22,8 +22,8 @@ export default function Dashboard() {
     setLoading(true);
     try {
       const data = await getCafes();
-      // Show only first 3 cafes for preview
-      setCafes((data || []).slice(0, 3));
+   
+     setCafes(data || []); 
     } catch (err) {
       console.error("Error fetching cafes:", err);
       setCafes([]);
@@ -105,12 +105,9 @@ export default function Dashboard() {
 
       <section className="cafes-preview">
         <div className="preview-header">
-          <div>
-            <h2 className="section-title">Featured Cafés</h2>
-            <p className="section-subtitle">Discover the perfect study spot on campus</p>
-          </div>
-          <a href="/cafes" className="view-all-link">View All →</a>
-        </div>
+  <h2 className="section-title">Featured Cafés</h2>
+  <p className="section-subtitle">Discover the perfect study spot on campus</p>
+</div>
 
         <div className="cafe-cards-grid">
           {cafes.map((cafe) => (

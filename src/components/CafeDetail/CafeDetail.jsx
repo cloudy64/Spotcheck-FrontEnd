@@ -1,3 +1,5 @@
+import { useContext } from 'react'; 
+import { UserContext } from '../../contexts/UserContext';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getCafeById } from '../../services/cafeService';
@@ -37,9 +39,9 @@ export default function CafeDetail() {
 
   return (
     <main className="landing-spotcheck">
-      <button onClick={() => navigate('/cafes')} style={{ margin: '2rem', padding: '0.75rem 1.5rem', background: '#333', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-        ← Back to Cafés
-      </button>
+      <button onClick={() => navigate('/')} className="back-btn">
+  ← Back to Dashboard
+    </button>
 
       <section className="hero-section">
         <div className="hero-content">
@@ -150,6 +152,16 @@ export default function CafeDetail() {
           </div>
         </div>
       </section>
+      {user && user.role === 'admin' && (
+  <section className="admin-actions" style={{ textAlign: 'center', padding: '2rem 0' }}>
+    <button 
+      onClick={() => navigate('/admin')}
+      className="btn-primary"
+    >
+      ✏️ Edit This Café
+    </button>
+  </section>
+)}
     </main>
   );
 }

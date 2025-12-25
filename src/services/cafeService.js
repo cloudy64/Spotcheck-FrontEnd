@@ -5,13 +5,17 @@ const getToken = () => localStorage.getItem("token");
 
 export const getCafes = async () => {
   try {
+
+    const token = localStorage.getItem("token");
+
     const res = await fetch(BASE_URL, {
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const data = await res.json();
-    console.log(data);
-    
 
     if (!res.ok) {
       throw new Error(data.err || "Failed to fetch cafes");
@@ -75,10 +79,12 @@ export const createCafe = async (cafeData) => {
     });
 
     const data = await res.json();
+    console.log(res.ok);
 
-    if (!res.ok) {
-      throw new Error(data.err || "Failed to create cafe");
-    }
+
+    // if (!res.ok) {
+    //   throw new Error(data.err || "Failed to create cafe");
+    // }
 
     return data;
   } catch (err) {

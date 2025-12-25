@@ -42,7 +42,7 @@ const App = () => {
             :
             <>
               <Route path='/' element={<Landing/>}/>
-              {/* Public café viewing for non-logged in users */}
+         
               <Route path='/cafes' element={<CafeList />} />
               <Route path='/cafes/:id' element={<CafeDetail />} />
             </>
