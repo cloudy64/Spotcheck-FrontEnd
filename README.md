@@ -21,6 +21,26 @@ Responsible for styling the application.
 4. Express.js
 Framework used to build the backend server and manage routes.
 
+
+
+
+Student Features (Authenticated)
+
+Personalized dashboard with welcome message
+Click-to-view detailed café information in modals
+See live seat availability with visual indicators
+Access complete café profiles (WiFi, power outlets, quiet zones, food options)
+
+Admin Features (Admin Role)
+
+Add New Café: Create cafés with full details (name, location, seats, hours, amenities, photos)
+Edit Café: Update any café information through comprehensive form
+Quick Seat Update: Fast interface to adjust available seats throughout the day
+Delete Café: Remove cafés with confirmation
+Admin Dashboard: Table view of all cafés with status tracking and management controls
+
+
+
 Future work:
 -create favourites section
 -the css need a better structure
