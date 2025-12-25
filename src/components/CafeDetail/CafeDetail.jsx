@@ -152,16 +152,6 @@ export default function CafeDetail() {
           </div>
         </div>
       </section>
-      {user && user.role === 'admin' && (
-  <section className="admin-actions" style={{ textAlign: 'center', padding: '2rem 0' }}>
-    <button 
-      onClick={() => navigate('/admin')}
-      className="btn-primary"
-    >
-      ✏️ Edit This Café
-    </button>
-  </section>
-)}
     </main>
   );
 }

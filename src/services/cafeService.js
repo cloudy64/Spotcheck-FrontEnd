@@ -28,7 +28,12 @@ export const getCafes = async () => {
 
 export const getCafeById = async (cafeId) => {
   try {
-    const res = await fetch(`${BASE_URL}/${cafeId}`);
+    const res = await fetch(`${BASE_URL}/${cafeId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
 
     const data = await res.json();
 
