@@ -30,11 +30,11 @@ const App = () => {
             <Route path='/profile' element={<h1>{user.username}</h1>}/>
             <Route path='/orders' element={<h1>ORDERS</h1>}/>
 
-            {/* Café routes */}
+          
             <Route path='/cafes' element={<CafeList />} />
             <Route path='/cafes/:id' element={<CafeDetail />} />
             
-            {/* Admin only route */}
+      
             {user.role === 'admin' && (
               <Route path='/admin/cafes' element={<AdminDashboard />} />
             )}

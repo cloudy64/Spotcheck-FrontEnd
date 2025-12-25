@@ -282,7 +282,7 @@ export default function AdminDashboard() {
             </div>
 
             <form onSubmit={handleSubmit} className="cafe-form enhanced-form">
-              {/* Row 1: Name and Emoji */}
+          
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="name">Café Name *</label>
@@ -325,7 +325,7 @@ export default function AdminDashboard() {
                 />
               </div>
 
-              {/* Row 2: Capacity and Available Seats */}
+              
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="totalSeats">Total Capacity *</label>
@@ -355,7 +355,6 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Upload Photo */}
               <div className="form-group">
                 <label htmlFor="photo">Upload Photo</label>
                 <div className="photo-upload-area">
@@ -374,7 +373,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Operating Hours */}
+              
               <div className="form-group">
                 <label>Operating Hours *</label>
                 <div className="hours-grid">
@@ -425,7 +424,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Amenities */}
+             
               <div className="form-group">
                 <label>Amenities</label>
                 <div className="amenities-checkboxes">
@@ -467,7 +466,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Form Actions */}
+              
               <div className="form-actions">
                 <button type="button" onClick={() => setShowModal(true)} className="cancel-btn">
                   Cancel

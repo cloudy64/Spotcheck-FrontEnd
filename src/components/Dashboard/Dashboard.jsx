@@ -13,7 +13,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchCafes();
-    // Load favorites from localStorage
+
     const savedFavorites = JSON.parse(localStorage.getItem('favoriteCafes') || '[]');
     setFavorites(savedFavorites);
   }, []);
